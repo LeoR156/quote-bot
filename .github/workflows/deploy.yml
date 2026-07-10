@@ -75,7 +75,7 @@ jobs:
               --restart unless-stopped \
               -e TOKEN="${{ secrets.TOKEN }}" \
               -e ADMIN_IDS="${{ secrets.ADMIN_IDS }}" \
-              -v /opt/quote-bot/data:/app/data \
+              -v quote_bot_data:/app/data \
               leor156/quote-bot:latest
 
             # Очищаем неиспользуемые образы, чтобы не забивать диск сервера
