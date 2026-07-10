@@ -10,9 +10,10 @@ class TestQuotes(unittest.TestCase):
 
     def setUp(self):
         """Создаем временный файл для каждого теста."""
-        self.tmp = tempfile.NamedTemporaryFile(
-            mode="w", suffix=".txt", delete=False, encoding="utf-8"
-        )
+        self.tmp = tempfile.NamedTemporaryFile(mode="w",
+                                               suffix=".txt",
+                                               delete=False,
+                                               encoding="utf-8")
         self.tmp.close()
         # Патчим путь к файлу в модуле quotes
         self.patcher = patch("src.quotes.DATA_FILE", Path(self.tmp.name))

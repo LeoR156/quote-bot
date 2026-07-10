@@ -13,7 +13,6 @@ logging.basicConfig(
 
 bot = TeleBot(TOKEN)
 
-
 # ─── Хэндлеры ────────────────────────────────────────────────────────────────
 
 
@@ -59,14 +58,14 @@ def cmd_add(message: Message):
     if message.from_user.id not in ADMIN_IDS:
         bot.reply_to(message, "🚫 У вас нет прав для добавления цитат.")
         logging.warning(
-            f"[/add] Unauthorized attempt by user_id={message.from_user.id}"
-        )
+            f"[/add] Unauthorized attempt by user_id={message.from_user.id}")
         return
 
     # Извлекаем текст после команды /add
     parts = message.text.split(maxsplit=1)
     if len(parts) < 2 or not parts[1].strip():
-        bot.reply_to(message, "✏️ Укажите текст цитаты. Пример:\n/add Жизнь прекрасна!")
+        bot.reply_to(
+            message, "✏️ Укажите текст цитаты. Пример:\n/add Жизнь прекрасна!")
         return
 
     quote_text = parts[1].strip()
@@ -74,7 +73,8 @@ def cmd_add(message: Message):
 
     if added:
         bot.reply_to(message, f"✅ Цитата добавлена:\n\n💬 {quote_text}")
-        logging.info(f"[/add] Added new quote by user_id={message.from_user.id}")
+        logging.info(
+            f"[/add] Added new quote by user_id={message.from_user.id}")
     else:
         bot.reply_to(message, "⚠️ Такая цитата уже есть в базе.")
 
