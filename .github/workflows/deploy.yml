@@ -1,0 +1,79 @@
+name: My first CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+
+  formatting-check:
+    name: Formatting Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: run YAPF to test if python code is correctly formatted
+        uses: AlexanderMelde/yapf-action@v2.0
+        with:
+          args: --verbose
+
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Run OWASP Noir
+        id: noir
+        uses: owasp-noir/noir@v1.1.0
+        with:
+          base_path: '.'
+      - name: Display results
+        run: echo '${{ steps.noir.outputs.endpoints }}' | jq .
+
+  build-and-push:
+    name: Build and push to Docker Hub
+    needs: [security-scan, formatting-check]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Скачиваем код бота
+        uses: actions/checkout@v4
+
+      - name: Логинимся в Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_LOGIN }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Сборка и пуш Docker образа
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: leor156/quote-bot:latest
+
+
+  deploy:
+    name: Deploy to VPS via SSH
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Подключение по SSH и обновление контейнера
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          script: |
+            docker pull leor156/quote-bot
+
+            docker stop weather_bot || true
+            docker rm weather_bot || true
+
+            docker run -d \
+              --name weather_bot \
+              --restart unless-stopped \
+              -e TG_TOKEN="${{ secrets.TG_TOKEN }}" \
+              -e WEATHER_API_KEY="${{ secrets.WEATHER_API_KEY }}" \
+              leor156/quote-bot
+
+            docker image prune -f
