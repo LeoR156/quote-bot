@@ -1,4 +1,4 @@
-name: My first CI/CD Pipeline
+name: Quote Bot CI/CD Pipeline
 
 on:
   push:
@@ -6,7 +6,6 @@ on:
       - main
 
 jobs:
-
   formatting-check:
     name: Formatting Check
     runs-on: ubuntu-latest
@@ -51,7 +50,6 @@ jobs:
           push: true
           tags: leor156/quote-bot:latest
 
-
   deploy:
     name: Deploy to VPS via SSH
     needs: build-and-push
@@ -64,16 +62,21 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker pull leor156/quote-bot
+            # Подтягиваем свежий образ
+            docker pull leor156/quote-bot:latest
 
-            docker stop weather_bot || true
-            docker rm weather_bot || true
+            # Останавливаем и удаляем старый контейнер
+            docker stop quote-bot || true
+            docker rm quote-bot || true
 
+            # Запускаем новый контейнер
             docker run -d \
-              --name weather_bot \
+              --name quote-bot \
               --restart unless-stopped \
-              -e TG_TOKEN="${{ secrets.TG_TOKEN }}" \
-              -e WEATHER_API_KEY="${{ secrets.WEATHER_API_KEY }}" \
-              leor156/quote-bot
+              -e TOKEN="${{ secrets.TOKEN }}" \
+              -e ADMIN_IDS="${{ secrets.ADMIN_IDS }}" \
+              -v /opt/quote-bot/data:/app/data \
+              leor156/quote-bot:latest
 
+            # Очищаем неиспользуемые образы, чтобы не забивать диск сервера
             docker image prune -f
