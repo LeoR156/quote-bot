@@ -51,32 +51,19 @@ jobs:
           tags: leor156/quote-bot:latest
 
   deploy:
-    name: Deploy to VPS via SSH
+    name: Deploy to VPS via Ansible
     needs: build-and-push
     runs-on: ubuntu-latest
     steps:
-      - name: Подключение по SSH и обновление контейнера
-        uses: appleboy/ssh-action@v1.0.3
+      - name: Скачиваем код репозитория (чтобы получить файл deploy.yml)
+        uses: actions/checkout@v4
+
+      - name: Запускаем Ansible плейбук
+        uses: dawidd6/action-ansible-playbook@v2
         with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key: ${{ secrets.SSH_KEY }}
-          script: |
-            # Подтягиваем свежий образ
-            docker pull leor156/quote-bot:latest
-
-            # Останавливаем и удаляем старый контейнер
-            docker stop quote-bot || true
-            docker rm quote-bot || true
-
-            # Запускаем новый контейнер
-            docker run -d \
-              --name quote-bot \
-              --restart unless-stopped \
-              -e TOKEN="${{ secrets.TOKEN }}" \
-              -e ADMIN_IDS="${{ secrets.ADMIN_IDS }}" \
-              -v quote_bot_data:/app/data \
-              leor156/quote-bot:latest
-
-            # Очищаем неиспользуемые образы, чтобы не забивать диск сервера
-            docker image prune -f
+          playbook: A_deploy.yml
+          key: ${{ secrets.SERVER_SSH_KEY }}
+          options: |
+            -i ${{ secrets.SERVER_HOST }},
+            -u ${{ secrets.SERVER_USER }}
+            --extra-vars "TOKEN=${{ secrets.TOKEN }} ADMIN_IDS=${{ secrets.WADMIN_IDS }}"

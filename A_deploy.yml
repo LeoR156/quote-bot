@@ -1,0 +1,35 @@
+# deploy.yml
+- name: Автоматический деплой Telegram-бота
+  hosts: all
+
+  vars:
+    image_name: "leor156/quote-bot:latest"
+    container_name: "quote-bot"
+
+  tasks:
+    - name: Убеждаемся, что установлена библиотека Docker для Python
+      apt:
+        name: python3-docker
+        state: present
+        update_cache: yes
+
+    - name: Скачиваем  образ бота с Docker Hub
+      community.docker.docker_image:
+        name: "{{ image_name }}"
+        source: pull
+
+    - name: Запускаем контейнер
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
+        state: started
+        restart_policy: unless-stopped
+        env:
+          TOKEN: "{{ TOKEN }}"
+          ADMIN_IDS: "{{ ADMIN_IDS }}"
+
+    - name:
+      community.docker.docker_prune:
+        images: yes
+        images_filters:
+          dangling: true
