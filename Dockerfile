@@ -10,7 +10,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY src/ ./src/
 
 
-RUN mkdir -p data
-
+COPY data/ ./data/
 # 
 CMD ["python", "-m", "src.bot"]
