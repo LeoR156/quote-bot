@@ -50,7 +50,6 @@ jobs:
           push: true
           tags: leor156/quote-bot:latest
 
-  name: Telegram Gate
 
   deploy:
     name: Deploy to VPS via Ansible
