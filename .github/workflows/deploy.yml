@@ -76,7 +76,7 @@ jobs:
       - name: Запускаем Ansible плейбук
         uses: dawidd6/action-ansible-playbook@v2
         with:
-          playbook: A_deploy.yml
+          playbook: auto-deployment/A_deploy.yml
           key: ${{ secrets.SERVER_SSH_KEY }}
           options: |
             -i ${{ secrets.SERVER_HOST }},
