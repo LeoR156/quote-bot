@@ -17,7 +17,7 @@ def get_random_quote() -> str | None:
     quotes = _read_all()
     if not quotes:
         return None
-    return random.choice(quotes)
+    return random.choice(quotes) # nosec
 
 
 def add_quote(text: str) -> bool:
