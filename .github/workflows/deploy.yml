@@ -29,7 +29,6 @@ jobs:
       - name: Display results
         run: echo '${{ steps.noir.outputs.endpoints }}' | jq .
 
-
   build-and-push:
     name: Build and push to Docker Hub
     needs: [security-scan, formatting-check]
@@ -42,7 +41,7 @@ jobs:
         uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_LOGIN }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          password: ${{ secrets.DOCKER_TOKEN }}
 
       - name: Сборка и пуш Docker образа
         uses: docker/build-push-action@v6
@@ -51,7 +50,7 @@ jobs:
           push: true
           tags: leor156/quote-bot:latest
     
-  #terraform plan:
+  #terraform infrastructure-check and infrastructure-deployment:
     #name: check infrastructure
     #needs: [build-and-push]
     #runs-on: ubuntu-latest
@@ -82,19 +81,15 @@ jobs:
           options: |
             -i ${{ secrets.SERVER_HOST }},
             -u ${{ secrets.SERVER_USER }}
-            --extra-vars "TOKEN=${{ secrets.TOKEN }} ADMIN_IDS=${{ secrets.WADMIN_IDS }}"
+            --extra-vars "TOKEN=${{ secrets.TG_TOKEN_QUOTE }} ADMIN_IDS=${{ secrets.ADMIN_ID_TG }}"
 
 
       - name: Notifier
         uses: ethyaan/tgate-action@v1.0.0
-        needs: deploy
         if: always()
         with:
-          token: ${{ secrets.token_A }}
-          to: ${{ secrets.ADMIN_IDS }}
+          token: ${{ secrets.TG_TOKEN_ALERT }}
+          to: ${{ secrets.ADMIN_ID_TG }}
           thread_id: ${{ secrets.threadid }}
           disable_web_page_preview: false
           disable_notification: false
-
-
-
