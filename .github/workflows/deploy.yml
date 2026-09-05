@@ -6,15 +6,15 @@ on:
       - main
 
 jobs:
-  formatting-check:
-    name: Formatting Check
+  check-syntax:
+    name: check 
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: run YAPF to test if python code is correctly formatted
-        uses: AlexanderMelde/yapf-action@v2.0
-        with:
-          args: --verbose
+      - name: Syntax Check
+        run: |
+          pip install pyflakes
+          pyflakes src/
 
   security-scan:
     name: Security Scan
@@ -35,7 +35,7 @@ jobs:
 
   build-and-push:
     name: Build and push to Docker Hub
-    needs: [security-scan, formatting-check]
+    needs: [security-scan, check-syntax]
     runs-on: ubuntu-latest
     steps:
       - name: Скачиваем код бота
