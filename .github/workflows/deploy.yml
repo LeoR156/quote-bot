@@ -47,6 +47,7 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
+          file: auto-deployment/Dockerfile
           push: true
           tags: leor156/quote-bot:latest
     
