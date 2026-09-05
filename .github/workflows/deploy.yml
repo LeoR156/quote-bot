@@ -25,9 +25,13 @@ jobs:
         id: noir
         uses: owasp-noir/noir@v1.1.0
         with:
-          base_path: '.'
+          base_path: 'src'
       - name: Display results
         run: echo '${{ steps.noir.outputs.endpoints }}' | jq .
+      - name: Run Bandit (Python SAST)
+        run: |
+          pip install bandit
+          bandit -r src/
 
   build-and-push:
     name: Build and push to Docker Hub
