@@ -62,8 +62,6 @@ jobs:
         #run: terraform plan
       #- name: Terraform apply
         #run: terraform apply -auto-approve
-      #- name:
-
 
   deploy:
     name: Deploy to VPS via Ansible
@@ -82,7 +80,6 @@ jobs:
             -i ${{ secrets.SERVER_HOST }},
             -u ${{ secrets.SERVER_USER }}
             --extra-vars "TOKEN=${{ secrets.TG_TOKEN_QUOTE }} ADMIN_IDS=${{ secrets.ADMIN_ID_TG }}"
-
 
       - name: Notifier
         uses: ethyaan/tgate-action@v1.0.0
