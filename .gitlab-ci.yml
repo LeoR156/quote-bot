@@ -61,7 +61,7 @@ variables:
   image: curlimages/curl:latest
   script:
     - |
-      curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
+      curl -s -X POST "https://api.telegram.org/bot$ALERT_TG_BOT/sendMessage" \
       -d chat_id="$ADMIN_ID_TG" \
       -d text="$MESSAGE" \
       -d parse_mode="HTML" \
