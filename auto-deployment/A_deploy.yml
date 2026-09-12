@@ -3,8 +3,9 @@
   hosts: all
 
   vars:
-    image_name: "leor156/quote-bot:latest"
-    container_name: "quote-bot"
+    image_name: "leor156/quote-bot:{{ image_tag | default('latest') }}"
+    container_name: "{{ container_name | default('quote-bot') }}"
+    container_state: "{{ container_state | default('started') }}"
 
   tasks:
     - name: Убеждаемся, что установлена библиотека Docker для Python
@@ -22,7 +23,7 @@
       community.docker.docker_container:
         name: "{{ container_name }}"
         image: "{{ image_name }}"
-        state: started
+        state: "{{ container_state }}"
         restart_policy: unless-stopped
         pull: always
         env:

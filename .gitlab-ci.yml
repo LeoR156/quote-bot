@@ -6,36 +6,37 @@ stages:
     - tests
     - build-and-push
     - deploy
-    - notify
 
 tests_job1:
   stage: tests
-  image: python:3.11-slim 
+  image: python:3.11-slim
   variables:
     PYTHONPATH: "."
   before_script:
-    - pip install --no-cache-dir -r requirements.txt 
+    - pip install --no-cache-dir -r requirements.txt
     - pip install pytest
   script:
-    - pytest tests/ 
+    - pytest tests/
 
 push_job:
-    stage: build-and-push
-    image:
-      name: gcr.io/kaniko-project/executor:v1.23.0-debug
-      entrypoint: [""]
-    before_script:
-      - mkdir -p /kaniko/.docker
-      - cp "$DOCKER_AUTH_CONFIG" /kaniko/.docker/config.json
-    script:
-      - >
-        /kaniko/executor
-        --context "${CI_PROJECT_DIR}"
-        --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
-        --destination "${DOCKERHUB_USER}/quote-bot:${CI_COMMIT_SHORT_SHA}"
-        --destination "${DOCKERHUB_USER}/quote-bot:latest"
+  resource_group: production
+  stage: build-and-push
+  image:
+    name: gcr.io/kaniko-project/executor:v1.23.0-debug
+    entrypoint: [""]
+  before_script:
+    - mkdir -p /kaniko/.docker
+    - cp "$DOCKER_AUTH_CONFIG" /kaniko/.docker/config.json
+  script:
+    - >
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${DOCKERHUB_USER}/quote-bot:${CI_COMMIT_SHORT_SHA}"
+      --destination "${DOCKERHUB_USER}/quote-bot:latest"
 
 deploy_to_server:
+  resource_group: production
   stage: deploy
   image: ghcr.io/ansible/creator-ee:v0.22.0
   variables:
@@ -49,6 +50,32 @@ deploy_to_server:
   script:
     - cd auto-deployment/
     - ansible-playbook -i inventory.ini A_deploy.yml
+        --extra-vars "image_tag=$CI_COMMIT_SHORT_SHA"
+
+  environment:
+    name: production
+    url: http://$SERVER_IP
+    on_stop: stop_production
+
+stop_production:
+  stage: deploy
+  image: ghcr.io/ansible/creator-ee:v0.22.0
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  before_script:
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$ANSIBLE_PRIVATE_KEY" > ~/.ssh/id_ed25519
+    - chmod 600 ~/.ssh/id_ed25519
+  script:
+    - cd auto-deployment/
+    - ansible-playbook -i inventory.ini A_deploy.yml
+        --extra-vars "container_state=absent"
+  when: manual
+  environment:
+    name: production
+    action: stop
+
 
 variables:
   MSG_SUCCESS: "✅ <b>Успех!</b> Пайплайн проекта <b>$CI_PROJECT_NAME</b> завершен.\nВетка: $CI_COMMIT_REF_NAME\nКоммит: $CI_COMMIT_MESSAGE"
@@ -57,7 +84,7 @@ variables:
 
 .notify_telegram:
   stage: .post
-  tags: 
+  tags:
     - tg
   image: curlimages/curl:latest
   script:
@@ -68,17 +95,14 @@ variables:
       -d parse_mode="HTML" \
       -d disable_web_page_preview="true"
 
-
 notify_success:
   extends: .notify_telegram
   variables:
     MESSAGE: $MSG_SUCCESS
   when: on_success
 
-
 notify_failure:
   extends: .notify_telegram
   variables:
     MESSAGE: $MSG_FAILURE
   when: on_failure
-  
