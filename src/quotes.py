@@ -37,3 +37,5 @@ def add_quote(text: str) -> bool:
 def count_quotes() -> int:
     """Возвращает количество цитат в базе."""
     return len(_read_all())
+
+# Секретная строка.
