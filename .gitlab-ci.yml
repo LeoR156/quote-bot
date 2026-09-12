@@ -1,0 +1,35 @@
+default:
+  tags: 
+    - universal
+
+stages:
+    - build
+    - tests
+    - deploy
+
+build_job1:
+    image: docker:latest
+    script:
+        - docker build -t quote-bot:v1 .
+
+tests_job1:
+  stage: tests
+  image: python:3.11-slim 
+  before_script:
+    - pip install --no-cache-dir -r requirements.txt 
+    - pip install pytest
+  script:
+    - pytest tests/
+
+deploy_to_server:
+  stage: deploy
+  image: cytopia/ansible:latest
+  variables:
+    ANSIBLE_HOST_KEY_CHECKING: "False"
+  before_script:
+    - echo "$ANSIBLE_PRIVATE_KEY" > ./deploy_key
+    - chmod 600 ./deploy_key
+  script:
+    - cd auto-deployment/
+    - ansible-playbook -i inventory.ini A_deploy.yml --private-key=./deploy_key
+
