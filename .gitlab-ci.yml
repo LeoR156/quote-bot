@@ -3,15 +3,9 @@ default:
     - universal
 
 stages:
-    - build
     - tests
+    - build and push
     - deploy
-
-build_job1:
-    stage: build
-    image: docker:latest
-    script:
-        - docker build -t quote-bot:v1 .
 
 tests_job1:
   stage: tests
@@ -23,6 +17,22 @@ tests_job1:
     - pip install pytest
   script:
     - pytest tests/
+
+build_job1:
+    stage: build and push
+    image:
+      name: gcr.io/kaniko-project/executor:v1.23.0-debug
+      entrypoint: [""]
+    before_script:
+
+    - mkdir -p /kaniko/.docker
+    - cp "$DOCKER_AUTH_CONFIG" /kaniko/.docker/config.json
+    script:
+    - /kaniko/executor
+      --context "${CI_PROJECT_DIR}"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfile"
+      --destination "${DOCKERHUB_USER}/quote-bot:${CI_COMMIT_SHORT_SHA}" \
+      --destination "${DOCKERHUB_USER}/quote-bot:latest"
 
 deploy_to_server:
   stage: deploy
