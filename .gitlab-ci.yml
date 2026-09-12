@@ -18,10 +18,6 @@ tests_job1:
   script:
     - pytest tests/
 
-build_job1:
-  image:
-
-
 push_job:
     stage: build-and-push
     image:
