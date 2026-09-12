@@ -4,8 +4,8 @@
 
   vars:
     image_name: "leor156/quote-bot:{{ image_tag | default('latest') }}"
-    container_name: "{{ container_name | default('quote-bot') }}"
-    container_state: "{{ container_state | default('started') }}"
+    container_name: "quote-bot"
+    container_state: "started"
 
   tasks:
     - name: Убеждаемся, что установлена библиотека Docker для Python
