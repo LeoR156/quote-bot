@@ -16,7 +16,7 @@ tests_job1:
     - pip install --no-cache-dir -r requirements.txt 
     - pip install pytest
   script:
-    - pytest tests/
+    - pytest tests/ 
 
 push_job:
     stage: build-and-push
