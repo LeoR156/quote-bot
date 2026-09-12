@@ -25,8 +25,8 @@
         state: started
         restart_policy: unless-stopped
         env:
-          TOKEN: "{{ TOKEN }}"
-          ADMIN_IDS: "{{ ADMIN_IDS }}"
+          TOKEN: "{{ lookup('env', 'BOT_TOKEN') }}"
+          ADMIN_IDS: "{{ lookup('env', 'ADMIN_ID_TG') }}"
 
     - name:
       community.docker.docker_prune:
