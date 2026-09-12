@@ -59,7 +59,7 @@ variables:
   image: curlimages/curl:latest
   script:
     - |
-      curl -s -X POST "https://api.telegram.org/bot$ALERT_TG_BOT/sendMessage" \
+      curl -s --resolve api.telegram.org:443:2.26.22.154 -X POST "https://api.telegram.org/bot$ALERT_TG_BOT/sendMessage" \
       -d chat_id="$ADMIN_ID_TG" \
       -d text="$MESSAGE" \
       -d parse_mode="HTML" \
