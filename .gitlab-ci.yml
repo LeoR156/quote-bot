@@ -30,9 +30,11 @@ deploy_to_server:
   variables:
     ANSIBLE_HOST_KEY_CHECKING: "False"
   before_script:
-    - echo "$ANSIBLE_PRIVATE_KEY" > ./deploy_key
-    - chmod 600 ./deploy_key
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo "$ANSIBLE_PRIVATE_KEY" > ~/.ssh/id_rsa
+    - chmod 600 ~/.ssh/id_rsa
     - ansible-galaxy collection install community.docker
   script:
     - cd auto-deployment/
-    - ansible-playbook -i inventory.ini A_deploy.yml --private-key=./deploy_key
+    - ansible-playbook -i inventory.ini A_deploy.yml
