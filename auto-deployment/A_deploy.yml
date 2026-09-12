@@ -24,6 +24,8 @@
         image: "{{ image_name }}"
         state: started
         restart_policy: unless-stopped
+        pull: always
+        recreate: auto
         env:
           TOKEN: "{{ lookup('env', 'BOT_TOKEN') }}"
           ADMIN_IDS: "{{ lookup('env', 'ADMIN_ID_TG') }}"
@@ -34,4 +36,4 @@
         images_filters:
           dangling: true
 
-    
+
