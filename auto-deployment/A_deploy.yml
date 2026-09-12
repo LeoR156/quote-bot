@@ -30,7 +30,7 @@
           TOKEN: "{{ lookup('env', 'BOT_TOKEN') }}"
           ADMIN_IDS: "{{ lookup('env', 'ADMIN_ID_TG') }}"
 
-    - name:
+    - name: Чистка
       community.docker.docker_prune:
         images: yes
         images_filters:

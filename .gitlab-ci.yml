@@ -54,7 +54,7 @@ deploy_to_server:
 
   environment:
     name: production
-    url: http://$SERVER_IP
+    url: http://$BOT_SERVER_IP
     on_stop: stop_production
 
 stop_production:
@@ -63,6 +63,7 @@ stop_production:
   variables:
     ANSIBLE_HOST_KEY_CHECKING: "False"
   before_script:
+    - ansible-galaxy collection install community.docker
     - mkdir -p ~/.ssh
     - chmod 700 ~/.ssh
     - echo "$ANSIBLE_PRIVATE_KEY" > ~/.ssh/id_ed25519
