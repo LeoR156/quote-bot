@@ -32,6 +32,7 @@ deploy_to_server:
   before_script:
     - echo "$ANSIBLE_PRIVATE_KEY" > ./deploy_key
     - chmod 600 ./deploy_key
+    - ansible-galaxy collection install community.docker
   script:
     - cd auto-deployment/
     - ansible-playbook -i inventory.ini A_deploy.yml --private-key=./deploy_key
