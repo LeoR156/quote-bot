@@ -16,6 +16,8 @@ build_job1:
 tests_job1:
   stage: tests
   image: python:3.11-slim 
+  variables:
+    PYTHONPATH: "."
   before_script:
     - pip install --no-cache-dir -r requirements.txt 
     - pip install pytest
