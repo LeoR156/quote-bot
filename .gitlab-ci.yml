@@ -57,7 +57,8 @@ variables:
 
 .notify_telegram:
   stage: .post
-  tags: tg
+  tags: 
+    - tg
   image: curlimages/curl:latest
   script:
     - |
