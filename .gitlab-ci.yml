@@ -54,29 +54,30 @@ variables:
   MSG_SUCCESS: "✅ <b>Успех!</b> Пайплайн проекта <b>$CI_PROJECT_NAME</b> завершен.\nВетка: $CI_COMMIT_REF_NAME\nКоммит: $CI_COMMIT_MESSAGE"
   MSG_FAILURE: "❌ <b>Ошибка!</b> Пайплайн проекта <b>$CI_PROJECT_NAME</b> упал.\nВетка: $CI_COMMIT_REF_NAME\n<a href='$CI_PIPELINE_URL'>Смотреть логи пайплайна</a>"
 
+
 .notify_telegram:
   stage: .post
+  tags: tg
   image: curlimages/curl:latest
   script:
     - |
-      curl -s --resolve api.telegram.org:443:2.26.22.154 -X POST "https://api.telegram.org/bot$ALERT_TG_BOT/sendMessage" \
+      curl -s -X POST "https://api.telegram.org/bot$TELEGRAM_BOT_TOKEN/sendMessage" \
       -d chat_id="$ADMIN_ID_TG" \
       -d text="$MESSAGE" \
       -d parse_mode="HTML" \
       -d disable_web_page_preview="true"
 
-# Успех
+
 notify_success:
   extends: .notify_telegram
   variables:
     MESSAGE: $MSG_SUCCESS
   when: on_success
 
-# Провал
+
 notify_failure:
   extends: .notify_telegram
   variables:
     MESSAGE: $MSG_FAILURE
   when: on_failure
-
   
