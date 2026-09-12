@@ -30,8 +30,10 @@ deploy_to_server:
   variables:
     ANSIBLE_HOST_KEY_CHECKING: "False"
   before_script:
+    - eval $(ssh-agent -s)
     - echo "$ANSIBLE_PRIVATE_KEY" > ./deploy_key
     - chmod 600 ./deploy_key
+    - ssh-add ./deploy_key
   script:
     - cd auto-deployment/
     - ansible-playbook -i inventory.ini A_deploy.yml --private-key=./deploy_key
