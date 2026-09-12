@@ -8,6 +8,7 @@ stages:
     - deploy
 
 build_job1:
+    stage: build
     image: docker:latest
     script:
         - docker build -t quote-bot:v1 .
