@@ -1,5 +1,5 @@
 default:
-  tags: 
+  tags:
     - universal
 
 stages:
