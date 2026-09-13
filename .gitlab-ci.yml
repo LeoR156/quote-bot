@@ -115,10 +115,6 @@ mirror_to_gitea:
   variables:
     GIT_STRATEGY: clone
   script:
-    - git config user.name "GitLab CI/CD"
-    - git config user.email "ci@leor156.online"
-    - git add -A
-    - git commit -m "Showcase update - ${CI_COMMIT_SHORT_SHA}"
     - git remote add gitea https://leo:$GITEA_TOKEN@gitea.leor156.online/leo/quote_bot_auto-deployment.git
     - git push gitea HEAD:main --force
   when: on_success
