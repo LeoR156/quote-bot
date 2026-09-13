@@ -106,3 +106,18 @@ notify_failure:
   variables:
     MESSAGE: $MSG_FAILURE
   when: on_failure
+
+mirror_to_gitea:
+  image: alpine/git:latest
+  stage: .post
+  variables:
+    GIT_DEPTH: 1
+  script:
+    - git config user.name "GitLab CI/CD"
+    - git config user.email "ci@leor156.online"
+    - git checkout --orphan showcase
+    - git add -A
+    - git commit -m "Showcase update: ${CI_COMMIT_SHORT_SHA}"
+    - git remote add gitea https://leo:$GITEA_TOKEN@gitea.leor156.online/leo/quote_bot_auto-deployment.git
+    - git push gitea showcase:main --force
+  when: on_success
