@@ -108,7 +108,9 @@ notify_failure:
   when: on_failure
 
 mirror_to_gitea:
-  image: alpine/git:latest
+  image:
+    name: alpine/git:latest
+    entrypoint: [""]
   stage: .post
   variables:
     GIT_DEPTH: 1
