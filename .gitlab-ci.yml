@@ -114,6 +114,7 @@ mirror_to_gitea:
   stage: .post
   variables:
     GIT_STRATEGY: clone
+    GIT_DEPTH: 0
   script:
     - git remote add gitea https://leo:$GITEA_TOKEN@gitea.leor156.online/leo/quote_bot_auto-deployment.git
     - git push gitea HEAD:main --force
