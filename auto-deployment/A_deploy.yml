@@ -27,8 +27,8 @@
         restart_policy: unless-stopped
         pull: always
         env:
-          TOKEN: "{{ lookup('env', 'TG_TOKEN_QUOTE') }}"
-          ADMIN_IDS: "{{ lookup('env', 'ADMIN_ID_TG') }}"
+          TOKEN: "{{ TOKEN }}"
+          ADMIN_IDS: "{{ ADMIN_IDS }}"
 
     - name: Чистка
       community.docker.docker_prune:
