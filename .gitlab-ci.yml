@@ -1,3 +1,4 @@
+# Универсальная группа раннеров
 default:
   tags:
     - universal
@@ -48,10 +49,10 @@ deploy_to_server:
     - chmod 600 ~/.ssh/id_ed25519
     - ansible-galaxy collection install community.docker
   script:
+    - echo "BOT_TOKEN=$BOT_TOKEN" > .env
+    - echo "ADMIN_IDS=$ADMIN_ID_TG" >> .env
     - cd auto-deployment/
-    - ansible-playbook -i inventory.ini A_deploy.yml
-        --extra-vars "image_tag=$CI_COMMIT_SHORT_SHA"
-
+    - ansible-playbook -i inventory.ini A_deploy.yml --extra-vars "image_tag=$CI_COMMIT_SHORT_SHA"
   environment:
     name: production
     url: http://$BOT_SERVER_IP

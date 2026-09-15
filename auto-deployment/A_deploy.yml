@@ -1,6 +1,7 @@
 # deploy.yml
 - name: Автоматический деплой Telegram-бота
   hosts: all
+  
 
   vars:
     image_name: "leor156/quote-bot:{{ image_tag | default('latest') }}"
@@ -8,16 +9,35 @@
     container_state: "started"
 
   tasks:
-    - name: Убеждаемся, что установлена библиотека Docker для Python
+    - name: Устанавливаем Docker и библиотеку для Python
       apt:
-        name: python3-docker
+        name: 
+          - docker.io
+          - python3-docker
         state: present
         update_cache: yes
+
+    - name: Убеждаемся, что Docker запущен
+      service:
+        name: docker
+        state: started
+        enabled: yes
 
     - name: Скачиваем  образ бота с Docker Hub
       community.docker.docker_image:
         name: "{{ image_name }}"
         source: pull
+
+    - name: Создать папку, если она отсутствует
+      ansible.builtin.file:
+        path: /opt/quote-bot
+        state: directory
+        mode: '0700'
+
+    - name: Копируем .env файл на сервер
+      copy:
+        src: ../.env
+        dest: /opt/quote-bot/.env
 
     - name: Запускаем контейнер
       community.docker.docker_container:
@@ -26,9 +46,7 @@
         state: "{{ container_state }}"
         restart_policy: unless-stopped
         pull: always
-        env:
-          TOKEN: "{{ lookup('env', 'BOT_TOKEN') }}"
-          ADMIN_IDS: "{{ lookup('env', 'ADMIN_ID_TG') }}"
+        env_file: /opt/quote-bot/.env
 
     - name: Чистка
       community.docker.docker_prune:
